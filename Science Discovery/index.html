@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart Generator</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(to right,#782f61,#ba7199);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            transition: background 0.5s, color 0.5s;
+        }
+
+        header {
+            width: 100%;
+            background-color: #690f4b;
+            padding: 10px 20px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(119, 118, 118, 0.2);
+            transition: background 0.5s;
+        }
+        .header-container {
+    width: 100%;
+    background-color: #6b20e0; /* Slightly darker background for contrast */
+    padding: 20px; /* Add padding around the header */
+    border-radius: 15px; /* Rounded corners for the container */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+    margin-bottom: 20px; /* Add space below the container */
+    border: 2px solid #5a1abc; /* Border with color and width */
+    transition: background 0.5s;
+}
+
+
+        h1 {
+            margin-top: 20px;
+            color: #ffffff;
+            transition: color 0.5s;
+        }
+
+        form {
+            background-color: #e0e0e072;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            transition: background 0.5s;
+        }
+
+        .charts-container {
+            display: flex;
+            flex-wrap: wrap;  
+            justify-content: center;  
+            gap: 20px;  
+        }
+
+        .chart-container {
+            width: 30%;
+            max-width: 400px;  
+            border: 2px solid #a79f9f69;  
+            border-radius: 8px;  
+            padding: 10px;  
+            background-color: #c8c8c865;  
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);  
+            transition: transform 0.3s;
+        }
+
+        .chart-container:hover {
+            transform: scale(1.05);
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #fe0c7d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #fe0c7d;
+        }
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background: linear-gradient(to right, #121212, #282828);
+            color: #ffffff;
+        }
+
+        header.dark-mode {
+            background-color: #1f1f1f;
+        }
+
+        form.dark-mode {
+            background-color: #383838;
+        }
+
+        /* Button to toggle dark mode */
+        .toggle-button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #fe0c7d;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .toggle-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Department Statistics</h1>
+        <button class="toggle-button" id="toggleDarkMode">Toggle Dark Mode</button>
+    </header>
+    
+    <form id="chartForm">
+        <label for="month_year">Select Month:</label>
+        <select id="month_year" name="month_year">
+            <option value="January 2024" selected>January 2024</option>
+            <option value="February 2024">February 2024</option>
+        </select>
+
+        <label for="department">Select Department:</label>
+        <select id="department" name="department">
+            <option value="Medical">Medical</option>
+            <option value="Engineering" selected>Engineering</option>
+            <option value="Arts">Arts</option>
+            <option value="Science">Science</option>
+        </select>
+        <button type="submit">Generate Charts</button>
+    </form>
+
+    <h2>Charts for <span id="selectedMonth">January 2024</span> - <span id="selectedDepartment">Engineering</span></h2>
+    
+    <div class="charts-container">
+        <div class="chart-container">
+            <h3>Bar Chart : Departments vs Student's Count</h3>
+            <div id="barChart" style="width:100%; height:300px;"></div>
+        </div>
+        <div class="chart-container">
+            <h3>Pie Chart : Overall Percentage</h3>
+            <div id="pieChart" style="width:100%; height:300px;"></div>
+        </div>
+        <div class="chart-container">
+            <h3>Line Chart : Milestone & Achievements</h3>
+            <div id="lineChart" style="width:100%; height:300px;"></div>
+        </div>
+        <div class="chart-container">
+            <h3>Spider Chart : Milestone Analysis</h3>
+            <div id="spiderChart" style="width:100%; height:300px;"></div>
+        </div>
+        <div class="chart-container">
+            <h3>Scatter Plot : Enrollment Analysis</h3>
+            <div id="scatterChart" style="width:100%; height:300px;"></div>
+        </div>
+        <div class="chart-container">
+            <h3>Pair Plot : Achievements Analysis</h3>
+            <div id="pairPlot" style="width:100%; height:300px;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for different months and departments
+        const data_by_month_and_department = {
+            'January 2024': {
+                'Medical': {
+                    'departments': ['Ayurveda', 'Unani', 'Yoga', 'Acupuncture'],
+                    'student_counts': [150, 120, 90, 80],
+                    'faculties_handling': [10, 8, 6, 5],
+                    'enrollments': [300, 350, 400, 450]
+                },
+                'Engineering': {
+                    'departments': ['Civil', 'Mechanical', 'Electrical', 'Computer Science'],
+                    'student_counts': [200, 180, 160, 220],
+                    'faculties_handling': [12, 10, 8, 15],
+                    'enrollments': [500, 400, 350, 600]
+                },
+                'Arts': {
+                    'departments': ['Fine Arts', 'Performing Arts', 'Literature', 'History'],
+                    'student_counts': [130, 140, 115, 95],
+                    'faculties_handling': [8, 6, 7, 5],
+                    'enrollments': [360, 310, 320, 280]
+                },
+                'Science': {
+                    'departments': ['Biology', 'Chemistry', 'Physics', 'Mathematics'],
+                    'student_counts': [170, 150, 140, 160],
+                    'faculties_handling': [11, 9, 8, 10],
+                    'enrollments': [430, 380, 390, 450]
+                }
+            },
+            'February 2024': {
+                'Medical': {
+                    'departments': ['Dentistry', 'Physiotherapy', 'Nursing', 'Pharmacy'],
+                    'student_counts': [110, 130, 95, 120],
+                    'faculties_handling': [9, 7, 5, 6],
+                    'enrollments': [280, 330, 370, 410]
+                },
+                'Engineering': {
+                    'departments': ['Aerospace', 'Chemical', 'Software', 'Information Technology'],
+                    'student_counts': [240, 220, 190, 230],
+                    'faculties_handling': [14, 12, 10, 15],
+                    'enrollments': [580, 490, 440, 620]
+                },
+                'Arts': {
+                    'departments': ['Graphic Design', 'Fashion Design', 'Theater', 'Music'],
+                    'student_counts': [140, 145, 120, 110],
+                    'faculties_handling': [6, 5, 7, 4],
+                    'enrollments': [380, 370, 350, 290]
+                },
+                'Science': {
+                    'departments': ['Environmental Science', 'Astronomy', 'Geology', 'Statistics'],
+                    'student_counts': [150, 155, 145, 160],
+                    'faculties_handling': [10, 9, 8, 11],
+                    'enrollments': [420, 390, 400, 460]
+                }
+            }
+        };
+
+        function generateCharts(data, month, department) {
+            document.getElementById('selectedMonth').textContent = month;
+            document.getElementById('selectedDepartment').textContent = department;
+
+            // Bar Chart
+            const barTrace = {
+                x: data.departments,
+                y: data.student_counts,
+                type: 'bar',
+                marker: { color: 'rgb(55, 83, 109)' }
+            };
+            const barData = [barTrace];
+            const barLayout = { title: `Student Count in ${department} Departments` };
+            Plotly.newPlot('barChart', barData, barLayout);
+
+            // Pie Chart
+            const pieTrace = {
+                labels: data.departments,
+                values: data.student_counts,
+                type: 'pie'
+            };
+            const pieData = [pieTrace];
+            const pieLayout = { title: `Overall Percentage of Students in ${department}` };
+            Plotly.newPlot('pieChart', pieData, pieLayout);
+
+            // Line Chart
+            const lineTrace = {
+                x: data.departments,
+                y: data.faculties_handling,
+                mode: 'lines+markers',
+                type: 'scatter',
+                line: { color: 'blue' }
+            };
+            const lineData = [lineTrace];
+            const lineLayout = { title: `Milestone & Achievements in ${department}` };
+            Plotly.newPlot('lineChart', lineData, lineLayout);
+
+            // Spider Chart (Radar)
+            const spiderTrace = {
+                type: 'scatterpolar',
+                r: data.student_counts,
+                theta: data.departments,
+                fill: 'toself'
+            };
+            const spiderData = [spiderTrace];
+            const spiderLayout = { polar: { radialaxis: { visible: true } }, title: `Milestone Analysis for ${department}` };
+            Plotly.newPlot('spiderChart', spiderData, spiderLayout);
+
+            // Scatter Plot
+            const scatterTrace = {
+                x: data.enrollments,
+                y: data.student_counts,
+                mode: 'markers',
+                type: 'scatter'
+            };
+            const scatterData = [scatterTrace];
+            const scatterLayout = { title: `Enrollment Analysis in ${department}` };
+            Plotly.newPlot('scatterChart', scatterData, scatterLayout);
+
+            // Pair Plot (Scatter Matrix)
+            const pairPlotTrace = {
+                x: data.departments,
+                y: data.student_counts,
+                mode: 'markers+text',
+                text: data.student_counts,
+                textposition: 'top center',
+                marker: { size: 10 }
+            };
+            const pairPlotData = [pairPlotTrace];
+            const pairPlotLayout = { title: `Achievements Analysis in ${department}` };
+            Plotly.newPlot('pairPlot', pairPlotData, pairPlotLayout);
+        }
+
+        // Event listener for form submission
+        document.getElementById('chartForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const selectedMonth = document.getElementById('month_year').value;
+            const selectedDepartment = document.getElementById('department').value;
+
+            const departmentData = data_by_month_and_department[selectedMonth][selectedDepartment];
+
+            generateCharts(departmentData, selectedMonth, selectedDepartment);
+        });
+
+        // Function to toggle dark mode
+        document.getElementById('toggleDarkMode').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            document.querySelector('header').classList.toggle('dark-mode');
+            document.querySelector('form').classList.toggle('dark-mode');
+        });
+
+        // Initial chart generation for default values
+        window.onload = function() {
+            const defaultMonth = document.getElementById('month_year').value;
+            const defaultDepartment = document.getElementById('department').value;
+            const defaultDepartmentData = data_by_month_and_department[defaultMonth][defaultDepartment];
+
+            generateCharts(defaultDepartmentData, defaultMonth, defaultDepartment);
+        };
+    </script>
+</body>
+</html>

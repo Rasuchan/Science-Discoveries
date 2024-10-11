@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Dashboard - Calendar & Events</title>
+    <link rel="stylesheet" href="design.css">
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <div class="logo">
+                <img src="logos.jpeg" alt="University Logo">
+                <span>Discoveries With Data Analytics </span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>  
+                    <li><a href="#calendar">Calendar</a></li>  
+                    <li><a href="#upcoming-events">Upcoming Events</a></li>  
+                </ul>
+            </nav>
+            <button id="theme-toggle">Toggle Dark Mode</button>
+        </div>
+        
+        <div class="news-ticker">
+            <span id="news-headlines"></span>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="banner">  
+            <div class="banner-text">
+                <h1>Welcome, Faculty Member!</h1>
+                <p>Navigate through department statistics and explore data-driven insights. Stay updated with university events and holidays.</p>
+                <button class="analytics-btn" onclick="exploreAnalytics()">Explore Analytics</button> 
+            </div>
+        </section>
+
+        <section id="calendar" class="calendar-container">  
+            <h2>University Calendar</h2>
+            <div class="calendar">
+                <div class="month-selection">
+                    <select id="month-select">
+                        <option value="0">January</option>
+                        <option value="1">February</option>
+                        <option value="2">March</option>
+                        <option value="3">April</option>
+                        <option value="4">May</option>
+                        <option value="5">June</option>
+                        <option value="6">July</option>
+                        <option value="7">August</option>
+                        <option value="8">September</option>
+                        <option value="9">October</option>
+                        <option value="10">November</option>
+                        <option value="11">December</option>
+                    </select>
+                    <select id="year-select">
+                        
+                    </select>
+                </div>
+                <div class="calendar-grid" id="calendar-grid"></div>
+            </div>
+        </section>
+
+        <section id="upcoming-events" class="events">  
+            <h2>Upcoming Events</h2>
+            <div class="event-list" id="event-list">
+                
+            </div>
+        </section>
+    </main>
+
+    
+    <div id="event-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Schedule Event</h2>
+            <label for="event-name">Event Name:</label>
+            <input type="text" id="event-name" placeholder="Enter event name">
+            <button id="save-event-btn">Save Event</button>
+        </div>
+    </div>
+
+    <script src="func.js"></script>
+    <script>
+        function exploreAnalytics() {
+            window.location.href = "../index.html"; 
+        }
+    </script>
+</body>
+</html>
